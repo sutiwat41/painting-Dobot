@@ -83,8 +83,8 @@ def showlocation():
                 showErrorState = True
 
         if showErrorState :
-            tk.messagebox.showinfo("show", "Error message")
-            status['text'] = "Exeed Limit"
+            tk.messagebox.showinfo("show", "Error : Exceed Limit")
+            status['text'] = "Exceed Limit"
 
             toHome()
             status['text'] = "toHome"
