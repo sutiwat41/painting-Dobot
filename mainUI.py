@@ -2,9 +2,12 @@ import paintAPI as paint
 import time
 import threading
 import tkinter as tk
+from tkinter import messagebox
+
+
 #----------- display function -----------#
 
-
+showErrorState = False
 coorlocation = ""
 jointlocation = ""
 status = ""
@@ -62,17 +65,40 @@ def showlocation():
             print("..")
             break
 
+        showErrorState = False
         displaylocation = [str(int(e)) for e in robot.getLocation()[0:4]]
         showText = ",".join(displaylocation)
         
         if type(coorlocation)!= str :  coorlocation['text'] = "Coordinate (x,y,z,rHead) : " +showText
-      
-        displaylocation = [str(int(e)) for e in robot.getLocation()[-1]]
+
+        checkLocation  =   robot.getLocation()[-1]
+
+        displaylocation = [str(int(e)) for e in checkLocation]
         showText = ",".join(displaylocation)
+        jointLimit = {"j1":(-90,90),"j2":(0,85),"j3":(-10,90),"j4":(-90,90)}
+        joint = ["j1","j2","j3","j4"]
+        for index,jointPos in enumerate(checkLocation):
+            #print(jointLimit[joint[index]][0],jointLimit[joint[index]][1])
+            if not ( jointLimit[joint[index]][0] < jointPos < jointLimit[joint[index]][1]):
+                showErrorState = True
+
+        if showErrorState :
+            tk.messagebox.showinfo("show", "Error message")
+            status['text'] = "Exeed Limit"
+
+            toHome()
+            status['text'] = "toHome"
+            showErrorState = False
+
+            break
+
+                
+                
+
 
         if type(jointlocation)!= str :   jointlocation['text'] = "joint (j1,j2,j3,j4) : " +showText
       
-        time.sleep(0.5)
+        time.sleep(0.2)
 
 def setIsspraying():
     global isspraying
@@ -132,24 +158,107 @@ def AutoUI():
 def ManualUI():
     mode = "Manual"
     global frame2
-    tk.Label(frame2, text="Manual Control", font=('Helvetica', 16, "bold")).grid(row = 0,column = 1,padx = 1,pady = 2)
+    tk.Label(frame2, text="Manual Control", font=('Helvetica', 16, "bold")).grid(row = 0,column = 0,padx = 1,pady = 2)
     
-    startbtn = tk.Button(frame2,text = "start",command = lambda : startfx(mode)).grid(row = 5,column = 1)
+
+    #----------------------- joy xyz -----------------------#
 
     joy = tk.Frame(frame2,width=150, height=150,bg = "Red") 
-    joy.grid(row = 2,column = 0)
-    tk.Label(frame2,text = "Cartesian control [mm]").grid(row = 1,column = 0)
-    tk.Button(joy,text = "y-",command = lambda : xyzcontrol("y-")).grid(row = 0,column = 1,padx = 4,pady = 4)
-    tk.Button(joy,text = "y+",command = lambda : xyzcontrol("y+")).grid(row = 2,column = 1,padx = 4,pady = 4)
-    tk.Button(joy,text = "x-",command = lambda : xyzcontrol("x-")).grid(row = 1,column = 0,padx = 4,pady = 4)
-    tk.Button(joy,text = "x+",command = lambda : xyzcontrol("x+")).grid(row = 1,column = 2,padx = 4,pady = 4)
+    joy.grid(row = 2,column = 0,padx = 4)
+    tk.Label(frame2,text = "Cartesian control").grid(row = 1,column = 0)
     tk.Button(joy,text = "home",command = toHome).grid(row = 1,column = 1,padx = 4,pady = 4)
+    
+    btn = tk.Button(joy,text = "x-")
+    btn.grid(row = 1,column = 0,padx = 4,pady = 4)
+    btn.bind("<Button-1>",lambda event : positioncontrol(event,cmd = "x-"))
+    btn.bind("<ButtonRelease-1>",lambda event : stopControl(event,mode = "xyz"))
 
-    tk.Button(joy,text = "z-",command = lambda : xyzcontrol("z-")).grid(row = 0,column = 3,padx = 4,pady = 4)
-    tk.Button(joy,text = "z+",command = lambda : xyzcontrol("z+")).grid(row = 2,column = 3,padx = 4,pady = 4)
+    btn2 = tk.Button(joy,text = "x+")
+    btn2.grid(row = 1,column = 2,padx = 4,pady = 4)
+    btn2.bind("<Button-1>",lambda event : positioncontrol(event,cmd = "x+"))
+    btn2.bind("<ButtonRelease-1>",lambda event : stopControl(event,mode = "xyz"))
+    
+    btn3 = tk.Button(joy,text = "y-")
+    btn3.grid(row = 2,column = 1,padx = 4,pady = 4)
+    btn3.bind("<Button-1>",lambda event : positioncontrol(event,cmd = "y-"))
+    btn3.bind("<ButtonRelease-1>",lambda event : stopControl(event,mode = "xyz"))
 
-    #tk.Label(frame2,text = "control Y [mm] :").grid(row = 2,column = 0)
-    #tk.Label(frame2,text = "control Z [mm] :").grid(row = 3,column = 0)
+    btn4 = tk.Button(joy,text = "y+")
+    btn4.grid(row = 0,column = 1,padx = 4,pady = 4)
+    btn4.bind("<Button-1>",lambda event : positioncontrol(event,cmd = "y+"))
+    btn4.bind("<ButtonRelease-1>",lambda event : stopControl(event,mode = "xyz"))
+
+
+    btn5 = tk.Button(joy,text = "z-")
+    btn5.grid(row = 0,column = 3,padx = 4,pady = 4)
+    btn5.bind("<Button-1>",lambda event : positioncontrol(event,cmd = "z-"))
+    btn5.bind("<ButtonRelease-1>",lambda event : stopControl(event,mode = "xyz"))
+
+    btn6 = tk.Button(joy,text = "z+")
+    btn6.grid(row = 2,column = 3,padx = 4,pady = 4)
+    btn6.bind("<Button-1>",lambda event : positioncontrol(event,cmd = "z+"))
+    btn6.bind("<ButtonRelease-1>",lambda event : stopControl(event,mode = "xyz"))
+
+    btn7 = tk.Button(joy,text = "r-")
+    btn7.grid(row = 0,column = 4,padx = 4,pady = 4)
+    btn7.bind("<Button-1>",lambda event : positioncontrol(event,cmd = "r-"))
+    btn7.bind("<ButtonRelease-1>",lambda event : stopControl(event,mode = "xyz"))
+
+    btn8 = tk.Button(joy,text = "r+")
+    btn8.grid(row = 2,column = 4,padx = 4,pady = 4)
+    btn8.bind("<Button-1>",lambda event : positioncontrol(event,cmd = "r+"))
+    btn8.bind("<ButtonRelease-1>",lambda event : stopControl(event,mode = "xyz"))
+
+    #--------------- joy for joint control ----------------------------#
+
+
+    joyjoint = tk.Frame(frame2,width=150, height=150,bg = "Red") 
+    joyjoint.grid(row = 2,column = 1,padx = 4)
+    tk.Label(frame2,text = "Joint control").grid(row = 1,column =1)
+    tk.Button(joyjoint,text = "home",command = toHome).grid(row = 1,column = 1,padx = 4,pady = 4)
+    btn = tk.Button(joyjoint,text = "j1-")
+    btn.grid(row = 1,column = 0,padx = 4,pady = 4)
+    btn.bind("<Button-1>",lambda event : positioncontrol(event,cmd = "j1-"))
+    btn.bind("<ButtonRelease-1>",lambda event : stopControl(event,mode = "joint"))
+
+    btn2 = tk.Button(joyjoint,text = "j1+")
+    btn2.grid(row = 1,column = 2,padx = 4,pady = 4)
+    btn2.bind("<Button-1>",lambda event : positioncontrol(event,cmd = "j1+"))
+    btn2.bind("<ButtonRelease-1>",lambda event : stopControl(event,mode = "joint"))
+    
+    btn3 = tk.Button(joyjoint,text = "j2-")
+    btn3.grid(row = 0,column = 1,padx = 4,pady = 4)
+    btn3.bind("<Button-1>",lambda event : positioncontrol(event,cmd = "j2-"))
+    btn3.bind("<ButtonRelease-1>",lambda event : stopControl(event,mode = "joint"))
+
+    btn4 = tk.Button(joyjoint,text = "j2+")
+    btn4.grid(row = 2,column = 1,padx = 4,pady = 4)
+    btn4.bind("<Button-1>",lambda event : positioncontrol(event,cmd = "j2+"))
+    btn4.bind("<ButtonRelease-1>",lambda event : stopControl(event,mode = "joint"))
+
+
+    btn5 = tk.Button(joyjoint,text = "j3-")
+    btn5.grid(row = 0,column = 3,padx = 4,pady = 4)
+    btn5.bind("<Button-1>",lambda event : positioncontrol(event,cmd = "j3-"))
+    btn5.bind("<ButtonRelease-1>",lambda event : stopControl(event,mode = "joint"))
+
+    btn6 = tk.Button(joyjoint,text = "j3+")
+    btn6.grid(row = 2,column = 3,padx = 4,pady = 4)
+    btn6.bind("<Button-1>",lambda event : positioncontrol(event,cmd = "j3+"))
+    btn6.bind("<ButtonRelease-1>",lambda event : stopControl(event,mode = "joint"))
+
+    btn7 = tk.Button(joyjoint,text = "j4-")
+    btn7.grid(row = 0,column = 4,padx = 4,pady = 4)
+    btn7.bind("<Button-1>",lambda event : positioncontrol(event,cmd = "j4-"))
+    btn7.bind("<ButtonRelease-1>",lambda event : stopControl(event,mode = "joint"))
+
+    btn8 = tk.Button(joyjoint,text = "j4+")
+    btn8.grid(row = 2,column = 4,padx = 4,pady = 4)
+    btn8.bind("<Button-1>",lambda event : positioncontrol(event,cmd = "j4+"))
+    btn8.bind("<ButtonRelease-1>",lambda event : stopControl(event,mode = "joint"))
+
+
+
 
     tk.Label(frame2,text = "control rail direction :").grid(row = 4,column = 0)
     railjoy = tk.Frame(frame2,width=100, height=30,bg = "Red") 
@@ -157,13 +266,48 @@ def ManualUI():
     tk.Button(railjoy,text = "L+",command = lambda : railControl(1)).grid(row = 0,column = 1,padx = 4,pady = 4)
     railjoy.grid(row = 5,column = 0)
 
+    tk.Label(frame2,text = "control spray :").grid(row = 4,column = 1)
+    sprayjoy = tk.Frame(frame2,width=100, height=30,bg = "Red") 
+    tk.Button(sprayjoy,text = "open",command = lambda : sprayControl(True)).grid(row = 0,column = 0,padx = 4,pady = 4)
+    tk.Button(sprayjoy,text = "close",command = lambda : sprayControl(False)).grid(row = 0,column = 1,padx = 4,pady = 4)
+    
+    sprayjoy.grid(row = 5,column = 1)
+
+    startbtn = tk.Button(frame2,text = "start",command = lambda : startfx(mode)).grid(row = 6,column = 1,pady = 4)
+
 #----------- dobot run : maunal command -----------#
-def xyzcontrol(cmd):
+def sprayControl(cmd):
     if not connect:
         print("Warning: not connect")
         status['text'] = "Warning: not connect"
     else:
-        robot.setJog("xyz",cmd)
+        if cmd:
+            status['text'] = "Spraying"
+            robot.switch12V(16,"on")
+            robot.update()
+        else:
+            status['text'] = "Close Spray"
+            robot.switch12V(16,"on")
+            robot.update()
+
+
+def positioncontrol(event,cmd):
+    if not connect:
+        print("Warning: not connect")
+        status['text'] = "Warning: not connect"
+    else:
+        if cmd in ["x-","x+","y-","y+","z-","z+","r-","r+"]:
+            robot.setJog("xyz",cmd)
+        elif cmd in ["j1-","j1+","j2-","j2+","j3-","j3+","j4-","j4+"]:
+            robot.setJog("joint",cmd)
+
+def stopControl(event,mode):
+    if not connect:
+        print("Warning: not connect")
+        status['text'] = "Warning: not connect"
+    else:
+        if mode == "xyz" :robot.stopJog("xyz")
+        else: robot.stopJog("joint")
 
 def railControl(rail_direction):
     if not connect:
@@ -175,7 +319,6 @@ def railControl(rail_direction):
 
         robot.stepperDriveDis(1,defaultSpeed,1,rail_direction)
         robot.update()   
-        None
 
 def toHome():
     if not connect:
@@ -186,6 +329,18 @@ def toHome():
         global robot
         robot.setPosition(x = 150,y = 0,z = 0)
         status['text'] = "to home 150,0,0"
+        time.sleep(1)
+        robot.update()
+
+def toHomeError():
+    if not connect:
+        print("Warning: not connect")
+        status['text'] = "Warning: not connect"
+    else:
+
+        global robot
+        robot.setPosition(x = 200,y = 0,z = 0)
+        status['text'] = "to home 200,0,0"
         time.sleep(1)
         robot.update()
 

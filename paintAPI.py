@@ -78,22 +78,27 @@ class paintingAPI:
     def setJog(self,mode,cmd):
         
         if mode == "xyz":
-            cmdDict = {"x+":0,"x-":1,"y+":2,"y-":3,"z+":4,"z-":5,"r+":6,"r-":7} 
-            tempmode = 0
-        
-        
+            cmdDict = {"x+":1,"x-":2,"y+":3,"y-":4,"z+":5,"z-":6,"r+":7,"r-":8} 
+            tempmode = 0        
         
         else:
-            cmdDict = {"j1+":0,"j1-":1,"j2+":2,"j2-":3,"j3+":4,"j3-":5,"j4+":6,"j4-":7} 
+            cmdDict = {"j1+":1,"j1-":2,"j2+":3,"j2-":4,"j3+":5,"j3-":6,"j4+":7,"j4-":8} 
             tempmode = 1
 
         tempcmd = cmdDict[cmd]
 
         self.lastIndex = dType.SetJOGCmd(self.api,tempmode,tempcmd,1)[0]
-        if tempcmd%2 == 0: tempcmd+=1
-        else: tempcmd-=1
-        self.lastIndex = dType.SetJOGCmd(self.api,tempmode,tempcmd,1)[0]
         self.update()
+
+    
+    def stopJog(self,mode):
+        if mode == "xyz":
+            tempmode = 0
+        else:
+            tempmode = 1  
+
+        self.lastIndex = dType.SetJOGCmd(self.api,tempmode,0,1)[0]
+        self.update()  
             
 
        
@@ -104,7 +109,7 @@ class paintingAPI:
         dType.SetQueuedCmdStartExec(self.api)
         #Wait for Executing Last Command 
         while self.lastIndex > dType.GetQueuedCmdCurrentIndex(self.api)[0]:
-            dType.dSleep(100)
+            dType.dSleep(10)
             
             #print("cmd :",self.lastIndex,dType.GetQueuedCmdCurrentIndex(self.api)[0])
             #if self.lastIndex -1 == dType.GetQueuedCmdCurrentIndex(self.api)[0]: break
