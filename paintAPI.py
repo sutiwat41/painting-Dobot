@@ -62,8 +62,19 @@ class paintingAPI:
         return [x,y,z,rHead,jointn]
 
     def movePosition(self,moveX = 0,moveY = 0,moveZ = 0):
-        self.lastIndex = dType.SetPTPCmd(self.api, 2, self.x+moveX, self.y+moveY, self.z+moveZ, self.rHead, 1)[0]
+        self.lastIndex = dType.SetPTPCmd(self.api, 1, self.x+moveX, self.y+moveY, self.z+moveZ, self.rHead, 1)[0]
         return self.lastIndex
+
+    def setPositionLong(self,x = None,y=None,z=None,rHead = None):
+        if x == None : x = self.x
+        if y == None : y = self.y
+        if z == None : z = self.z
+        if rHead == None : rHead = self.rHead
+        #print(x,y,z,rHead)
+        self.lastIndex = dType.SetPTPCmd(self.api, 1, x, y, z,rHead, 1)[0]
+        
+        return self.lastIndex
+    
 
     def setPosition(self,x = None,y=None,z=None,rHead = None):
         if x == None : x = self.x

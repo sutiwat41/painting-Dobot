@@ -89,6 +89,7 @@ def showlocation():
             toHome()
             status['text'] = "toHome"
             showErrorState = False
+            status['text'] = "Press start again"
 
             break
 
@@ -98,7 +99,7 @@ def showlocation():
 
         if type(jointlocation)!= str :   jointlocation['text'] = "joint (j1,j2,j3,j4) : " +showText
       
-        time.sleep(0.2)
+        time.sleep(0.1)
 
 def setIsspraying():
     global isspraying
@@ -339,7 +340,7 @@ def toHomeError():
     else:
 
         global robot
-        robot.setPosition(x = 200,y = 0,z = 0)
+        robot.setPositionLong(x = 200,y = 0,z = 0)
         status['text'] = "to home 200,0,0"
         time.sleep(1)
         robot.update()
