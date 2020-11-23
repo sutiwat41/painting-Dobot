@@ -10,3 +10,9 @@ In this project we developed mechanical gripper for painting and program for con
 |python  |3.7.9  |
 |tkinter  |8.6  |
 | dobot API| v2.1|
+
+## How to run
+
+1. Install [dobot studio](https://www.dobot.cc/downloadcenter/dobot-magician.html)
+2. clone painting-Dobot to your computer
+3. open mainUI.py
