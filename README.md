@@ -11,8 +11,14 @@ In this project we developed mechanical gripper for painting and program for con
 |tkinter  |8.6  |
 | dobot API| v2.1|
 
-## How to run
+## How to install
 
 1. Install [dobot studio](https://www.dobot.cc/downloadcenter/dobot-magician.html)
 2. clone painting-Dobot to your computer
-3. open mainUI.py
+
+## How to use
+1. open mainUI.py
+2. select mode(auto/manual)
+3. click connect
+4. (auto) insert parameter
+5. click start
